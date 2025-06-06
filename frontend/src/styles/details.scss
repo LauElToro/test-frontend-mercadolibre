@@ -1,0 +1,129 @@
+.details-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 1rem;
+  font-family: 'Segoe UI', sans-serif;
+  color: #333;
+
+  .details-main {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-bottom: 2rem;
+
+    .details-image {
+      flex: 1 1 400px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #fafafa;
+      padding: 1rem;
+      border-radius: 8px;
+
+      img {
+        max-width: 100%;
+        max-height: 400px;
+        object-fit: contain;
+      }
+    }
+
+    .details-info {
+      flex: 1 1 400px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+
+      .condition {
+        font-size: 0.9rem;
+        color: #888;
+        margin-bottom: 0.5rem;
+      }
+
+      .breadcrumbs {
+        font-size: 0.85rem;
+        color: #aaa;
+        margin-bottom: 0.8rem;
+      }
+
+      .title {
+        font-size: 1.6rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+      }
+
+      .price {
+        font-size: 2rem;
+        color: #333;
+        margin-bottom: 0.5rem;
+      }
+
+      .regular-price {
+        font-size: 1rem;
+        color: #999;
+        text-decoration: line-through;
+        margin-bottom: 0.5rem;
+      }
+
+      .installments {
+        font-size: 0.95rem;
+        color: #009b3a;
+        margin-bottom: 1rem;
+      }
+
+      .buy-button {
+        background-color: #3483fa;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out;
+
+        &:hover {
+          background-color: #2968c8;
+        }
+      }
+    }
+  }
+
+  .details-description,
+  .details-attributes {
+    background: #f7f7f7;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+
+    h2 {
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+
+      li {
+        font-size: 0.95rem;
+        margin-bottom: 0.4rem;
+
+        strong {
+          font-weight: 600;
+          margin-right: 4px;
+        }
+      }
+    }
+  }
+
+  .loading {
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.2rem;
+    color: #777;
+  }
+}

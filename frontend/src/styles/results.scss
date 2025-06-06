@@ -1,0 +1,49 @@
+.results-page {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: #333;
+  }
+
+  .results-grid {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+
+    span {
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    button {
+      padding: 0.5rem 1rem;
+      background: #fff159;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+
+      &:hover:not(:disabled) {
+        background: #ffe600;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+}

@@ -1,0 +1,56 @@
+.results-list {
+  list-style: none;
+  margin-top: 1rem;
+  padding: 0;
+
+  li {
+    padding: 1rem;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    gap: 1rem;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #f8f8f8;
+    }
+
+    img {
+      width: 100px;
+      height: auto;
+    }
+
+    .info {
+      flex: 1;
+
+      h2 {
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+      }
+
+      p {
+        font-size: 1rem;
+      }
+    }
+  }
+}
+
+.details {
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .gallery {
+    display: flex;
+    overflow-x: auto;
+
+    img {
+      height: 200px;
+      margin-right: 1rem;
+    }
+  }
+
+  .description {
+    margin-top: 1rem;
+  }
+}
