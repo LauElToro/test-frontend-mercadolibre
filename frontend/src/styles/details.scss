@@ -1,129 +1,124 @@
-.details-container {
+@import url('https://fonts.googleapis.com/css?family=Proxima+Nova:300,400,600&display=swap');
+
+.details-page {
+  font-family: 'Proxima Nova', sans-serif;
   max-width: 1200px;
   margin: 2rem auto;
+  background: #FFFFFF;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
   padding: 1rem;
-  font-family: 'Segoe UI', sans-serif;
-  color: #333;
 
-  .details-main {
+  @media(min-width: 768px) {
+    grid-template-columns: 2fr 1fr;
+  }
+
+  &__gallery {
     display: flex;
-    flex-wrap: wrap;
-    gap: 2rem;
-    margin-bottom: 2rem;
+    gap: 1rem;
+  }
 
-    .details-image {
-      flex: 1 1 400px;
+  &__thumbnails {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+
+    @media(min-width: 768px) {
       display: flex;
-      justify-content: center;
-      align-items: center;
-      background: #fafafa;
-      padding: 1rem;
-      border-radius: 8px;
-
-      img {
-        max-width: 100%;
-        max-height: 400px;
-        object-fit: contain;
-      }
+      width: 80px;
     }
 
-    .details-info {
-      flex: 1 1 400px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-
-      .condition {
-        font-size: 0.9rem;
-        color: #888;
-        margin-bottom: 0.5rem;
-      }
-
-      .breadcrumbs {
-        font-size: 0.85rem;
-        color: #aaa;
-        margin-bottom: 0.8rem;
-      }
-
-      .title {
-        font-size: 1.6rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
-      }
-
-      .price {
-        font-size: 2rem;
-        color: #333;
-        margin-bottom: 0.5rem;
-      }
-
-      .regular-price {
-        font-size: 1rem;
-        color: #999;
-        text-decoration: line-through;
-        margin-bottom: 0.5rem;
-      }
-
-      .installments {
-        font-size: 0.95rem;
-        color: #009b3a;
-        margin-bottom: 1rem;
-      }
-
-      .buy-button {
-        background-color: #3483fa;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        padding: 12px 20px;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: background-color 0.2s ease-in-out;
-
-        &:hover {
-          background-color: #2968c8;
-        }
+    .details-page__thumb {
+      width: 100%;
+      height: 75px;
+      object-fit: cover;
+      border: 2px solid transparent;
+      cursor: pointer;
+      &.active {
+        border-color: #3483FA;
       }
     }
   }
 
-  .details-description,
-  .details-attributes {
-    background: #f7f7f7;
-    border-radius: 8px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
+  &__main-image {
+    flex: 1;
+    .details-page__main-image img {
+      width: 100%;
+      aspect-ratio: 1/1;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+  }
 
-    h2 {
-      font-size: 1.3rem;
-      margin-bottom: 1rem;
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .condition,
+    .breadcrumbs {
+      font-size: 14px;
+      color: rgba(0,0,0,0.55);
     }
 
-    p {
-      font-size: 1rem;
-      line-height: 1.6;
+    .title {
+      font-size: 24px;
+      font-weight: 600;
+      color: rgba(0,0,0,0.9);
     }
 
-    ul {
-      list-style: none;
-      padding: 0;
+    .price {
+      font-size: 36px;
+      font-weight: 400;
+      color: rgba(0,0,0,0.9);
+    }
 
+    .regular-price {
+      font-size: 14px;
+      text-decoration: line-through;
+      color: rgba(0,0,0,0.55);
+    }
+
+    .installments {
+      font-size: 14px;
+      color: rgba(0,0,0,0.55);
+    }
+
+    .buy-button {
+      padding: 12px 24px;
+      background: #3483FA;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      &:hover {
+        background: #2968C8;
+      }
+    }
+
+    .description,
+    .attributes {
+      h2 {
+        font-size: 18px;
+        font-weight: 400;
+        color: rgba(0,0,0,0.9);
+        margin-bottom: 8px;
+      }
+      p,
       li {
-        font-size: 0.95rem;
-        margin-bottom: 0.4rem;
-
-        strong {
-          font-weight: 600;
-          margin-right: 4px;
-        }
+        font-size: 16px;
+        color: rgba(0,0,0,0.8);
+      }
+      li strong {
+        font-weight: 600;
+      }
+      ul {
+        padding: 0;
+        list-style: none;
       }
     }
-  }
-
-  .loading {
-    text-align: center;
-    padding: 2rem;
-    font-size: 1.2rem;
-    color: #777;
   }
 }

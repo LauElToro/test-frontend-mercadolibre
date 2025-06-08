@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "../styles/productCard.scss";
+import "../styles/productcard.scss";
 
 const ProductCard = ({ item }) => {
   if (!item || !item.id) return null;

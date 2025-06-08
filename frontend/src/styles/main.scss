@@ -1,6 +1,29 @@
-@import './variables';
-@import './mixins';
-@import './base';
-@import './layout';
-@import './components';
-@import './pages';
+@use './variables';
+@use './mixins';
+@use './layout';
+@use './header';
+@use './searchBox';
+@use './productCard';
+@use './details';
+@use './pages';
+
+body {
+  background-color: variables.$secondary-color;
+  font-family: variables.$font-family;
+  font-size: variables.$font-size-base;
+  color: variables.$text-secondary-color;
+  margin: 0;
+  padding: 0;
+}
+
+.home-page {
+  text-align: center;
+  margin-top: variables.$spacing-4xl;
+
+  .welcome-message {
+    font-size: variables.$font-size-lg;
+    font-weight: variables.$font-weight-semibold;
+    color: variables.$text-secondary-color;
+    margin-bottom: variables.$spacing-3xl;
+  }
+}

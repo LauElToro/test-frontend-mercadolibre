@@ -1,67 +1,69 @@
 .product-card {
   display: flex;
-  gap: 1rem;
+  align-items: flex-start;
+  background-color: #FFFFFF;
+  border-radius: 4px;
+  margin-bottom: 16px;
   text-decoration: none;
   color: inherit;
-  padding: 1rem;
-  border: 1px solid #eee;
-  border-radius: 8px;
-  background: #fff;
-  transition: box-shadow 0.2s ease;
-
-  &:hover {
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  }
-
   &__image {
-    flex: 0 0 120px;
-
+    width: 259px;
+    height: 250px;         /* fija altura y ancho */
+    overflow: hidden;      /* recorta si la img es más grande */
     img {
       width: 100%;
-      height: auto;
-      border-radius: 6px;
+      height: 100%;
+      object-fit: cover;   /* rellena todo el contenedor sin deformar */
     }
+  
   }
-
   &__info {
     flex: 1;
-    display: flex;
-    flex-direction: column;
   }
-
   &__title {
-    font-size: 1.1rem;
-    margin: 0 0 0.3rem;
+    font-size: 20px;
+    font-weight: 300;
+    color: rgba(0, 0, 0, 0.9);  /* Título en negro 90%  */
+    margin-bottom: 6px;
   }
-
   &__price {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin: 0;
-
+    font-size: 24px;
+    font-weight: 400;
+    color: rgba(0, 0, 0, 0.9);   /* Precio en negro 90% :contentReference[oaicite:41]{index=41} */
     .product-card__regular {
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.55); /* Precio anterior en gris 55% :contentReference[oaicite:42]{index=42} */
       text-decoration: line-through;
-      color: #888;
-      margin-left: 0.5rem;
-      font-size: 0.95rem;
-      font-weight: normal;
+      margin-left: 8px;
     }
   }
-
   &__installments {
-    color: #555;
-    font-size: 0.95rem;
-    margin-top: 0.2rem;
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.55);  /* Texto de cuotas en gris 55%  */
+    margin: 4px 0;
   }
-
   &__condition {
-    font-size: 0.9rem;
-    color: #666;
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.55);  /* Estado (Nuevo/Usado) en gris 55% pequeño :contentReference[oaicite:44]{index=44} */
+    margin: 4px 0;
   }
-
   &__shipping {
-    margin-top: 0.3rem;
-    color: #2ecc71;
-    font-weight: 500;
+    font-size: 14px;
+    color: #00A650;             /* "Envío gratis" en verde MercadoLibre :contentReference[oaicite:45]{index=45} */
+    font-weight: 400;
+    margin-top: 4px;
   }
+  /* (Ejemplo de posible etiqueta de descuento, si se implementara) */
+  &__discount {
+    font-size: 14px;
+    color: #00A650;             /* Porcentaje OFF en verde seminegrita :contentReference[oaicite:46]{index=46} */
+    font-weight: 600;
+    margin-left: 8px;
+  }
+}
+
+.product-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;  /* Espacio vertical entre tarjetas de producto */
 }

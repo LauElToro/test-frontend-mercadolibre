@@ -1,6 +1,6 @@
 import React from "react";
 import ProductCard from "./ProductCard";
-import './ProductList.scss';
+import "../styles/productlist.scss";
 
 const ProductList = ({ items, onItemClick }) => {
   return (

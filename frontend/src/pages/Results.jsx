@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { fetchItems } from "../utils/api";
 import ProductCard from "../components/ProductCard";
-import "../styles/results.scss";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const ITEMS_PER_PAGE = 3;
 
@@ -33,24 +33,42 @@ const Results = () => {
   };
 
   return (
-    <div className="results-page">
-      <h2>Resultados para: "{query}"</h2>
+    <div className="container my-4">
+      <h2 className="mb-4 text-dark">Resultados para: “{query}”</h2>
 
-      <div className="results-grid">
-        {paginatedProducts.map((item) => (
-          <ProductCard key={item.id} item={item} />
+      <div className="row gy-4">
+        {paginatedProducts.map(item => (
+          <div key={item.id} className="col-12">
+            <ProductCard item={item} />
+          </div>
         ))}
       </div>
 
-      <div className="pagination">
-        <button disabled={page === 1} onClick={() => handlePageChange(page - 1)}>
-          Anterior
-        </button>
-        <span>Página {page} de {totalPages}</span>
-        <button disabled={page >= totalPages} onClick={() => handlePageChange(page + 1)}>
-          Siguiente
-        </button>
-      </div>
+      <nav className="mt-4">
+        <ul className="pagination justify-content-center">
+          <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
+            <button
+              className="page-link"
+              onClick={() => handlePageChange(page - 1)}
+            >
+              Anterior
+            </button>
+          </li>
+          <li className="page-item disabled">
+            <span className="page-link">
+              Página {page} de {totalPages}
+            </span>
+          </li>
+          <li className={`page-item ${page >= totalPages ? "disabled" : ""}`}>
+            <button
+              className="page-link"
+              onClick={() => handlePageChange(page + 1)}
+            >
+              Siguiente
+            </button>
+          </li>
+        </ul>
+      </nav>
     </div>
   );
 };
