@@ -4,50 +4,96 @@
   font-family: 'Proxima Nova', sans-serif;
   max-width: 1200px;
   margin: 2rem auto;
+  padding: 1rem;
   background: #FFFFFF;
   display: grid;
   grid-template-columns: 1fr;
   gap: 2rem;
-  padding: 1rem;
 
-  @media(min-width: 768px) {
+  @media(min-width: 1024px) {
     grid-template-columns: 2fr 1fr;
+  }
+
+  &__breadcrumbs {
+    grid-column: 1 / -1;
+    margin-bottom: 1rem;
+
+    .breadcrumbs-link {
+      font-size: 14px;
+      color: #3483fa;
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: 4px;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    .breadcrumbs-path {
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.55);
+    }
   }
 
   &__gallery {
     display: flex;
+    flex-direction: row;
     gap: 1rem;
+    align-items: flex-start;
+    position: relative;
+    flex-wrap: wrap;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+    }
+  }
+
+  &__main-image {
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: zoom-in;
+
+    img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: contain;
+      display: block;
+    }
   }
 
   &__thumbnails {
-    display: none;
+    display: flex;
     flex-direction: column;
     gap: 8px;
+    width: 80px;
 
-    @media(min-width: 768px) {
-      display: flex;
-      width: 80px;
+    @media (max-width: 768px) {
+      flex-direction: row;
+      flex-wrap: wrap;
+      width: 100%;
+      margin-top: 1rem;
     }
 
     .details-page__thumb {
       width: 100%;
       height: 75px;
-      object-fit: cover;
+      object-fit: contain;
       border: 2px solid transparent;
       cursor: pointer;
+      border-radius: 4px;
+
       &.active {
         border-color: #3483FA;
       }
-    }
-  }
 
-  &__main-image {
-    flex: 1;
-    .details-page__main-image img {
-      width: 100%;
-      aspect-ratio: 1/1;
-      object-fit: cover;
-      border-radius: 4px;
+      @media (max-width: 768px) {
+        width: 75px;
+        height: 75px;
+      }
     }
   }
 
@@ -57,32 +103,31 @@
     gap: 1rem;
 
     .condition,
-    .breadcrumbs {
+    .installments,
+    .shipping,
+    .warranty,
+    .color,
+    .seller {
       font-size: 14px;
-      color: rgba(0,0,0,0.55);
+      color: rgba(0, 0, 0, 0.55);
     }
 
     .title {
       font-size: 24px;
       font-weight: 600;
-      color: rgba(0,0,0,0.9);
+      color: rgba(0, 0, 0, 0.9);
     }
 
     .price {
       font-size: 36px;
       font-weight: 400;
-      color: rgba(0,0,0,0.9);
+      color: rgba(0, 0, 0, 0.9);
     }
 
     .regular-price {
       font-size: 14px;
       text-decoration: line-through;
-      color: rgba(0,0,0,0.55);
-    }
-
-    .installments {
-      font-size: 14px;
-      color: rgba(0,0,0,0.55);
+      color: rgba(0, 0, 0, 0.55);
     }
 
     .buy-button {
@@ -94,31 +139,64 @@
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
+
       &:hover {
         background: #2968C8;
       }
     }
 
-    .description,
-    .attributes {
+    &.description,
+    &.attributes {
       h2 {
         font-size: 18px;
         font-weight: 400;
-        color: rgba(0,0,0,0.9);
+        color: rgba(0, 0, 0, 0.9);
         margin-bottom: 8px;
       }
+
       p,
       li {
         font-size: 16px;
-        color: rgba(0,0,0,0.8);
+        color: rgba(0, 0, 0, 0.8);
       }
+
       li strong {
         font-weight: 600;
       }
+
       ul {
         padding: 0;
         list-style: none;
       }
     }
   }
+}
+
+.zoom-preview {
+  position: absolute;
+  top: 0;
+  left: calc(100% + 1rem);
+  width: 400px;
+  height: 400px;
+  background-repeat: no-repeat;
+  background-size: 200%;
+  background-position: center;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 10;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.zoom-lens {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background-color: rgba(200, 200, 200, 0.4); 
+  border: 1px solid rgba(150, 150, 150, 0.3);
+  pointer-events: none;
+  z-index: 5;
 }

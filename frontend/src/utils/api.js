@@ -15,11 +15,6 @@ export const fetchItems = async (query) => {
 export const fetchItemDetail = async (id) => {
   const res = await fetch(`http://localhost:3000/api/items/${id}`);
   if (!res.ok) throw new Error("Error al obtener detalle del producto");
-  return await res.json();
-};
-
-export const fetchItemById = async (id) => {
-  const res = await fetch(`${API_BASE}/items/${id}`);
-  if (!res.ok) throw new Error('Error al obtener producto');
-  return res.json();
+  const data = await res.json();
+  return data;
 };

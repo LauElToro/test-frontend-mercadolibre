@@ -1,12 +1,16 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState, useRef } from "react";
+import { useParams, Link } from "react-router-dom";
 import { fetchItemDetail } from "../utils/api";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import "../styles/Details.scss";
 
 const Details = () => {
   const { id } = useParams();
   const [item, setItem] = useState(null);
   const [activeImage, setActiveImage] = useState("");
+  const [showZoom, setShowZoom] = useState(false);
+  const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });
+  const [lensPos, setLensPos] = useState({ top: 0, left: 0 });
+  const imgRef = useRef(null);
 
   useEffect(() => {
     fetchItemDetail(id)
@@ -17,97 +21,118 @@ const Details = () => {
       .catch(console.error);
   }, [id]);
 
+  const handleMouseMove = (e) => {
+    const rect = imgRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setZoomPos({ x, y });
+
+    const lensSize = 100;
+    const offsetX = e.clientX - rect.left - lensSize / 2;
+    const offsetY = e.clientY - rect.top - lensSize / 2;
+    setLensPos({ top: offsetY, left: offsetX });
+  };
+
   if (!item) return <div className="text-center py-5">Cargando detalle...</div>;
 
   return (
-    <div className="container my-5">
-      <div className="row gx-4 gy-4">
-        {/* Miniaturas: columna estrecha */}
-        <div className="col-2 d-none d-md-flex flex-column align-items-center">
+    <div className="details-page">
+      <div className="details-page__breadcrumbs">
+        <Link to="/" className="breadcrumbs-link">Volver al listado</Link>
+        <div className="breadcrumbs-path">
+          {item.category_path_from_root?.join(" > ")}
+        </div>
+      </div>
+
+      <div className="details-page__gallery">
+        <div className="details-page__thumbnails">
           {item.pictures.map((pic) => (
             <img
               key={pic}
               src={pic}
               alt={item.title}
-              className={`img-thumbnail mb-2 thumbnail ${
-                pic === activeImage ? "border-primary" : ""
-              }`}
-              style={{ cursor: "pointer" }}
+              className={`details-page__thumb ${pic === activeImage ? "active" : ""}`}
               onMouseEnter={() => setActiveImage(pic)}
             />
           ))}
         </div>
 
-        <div className="col-12 col-md-6">
-          <div className="ratio ratio-1x1">
-            <img
-              src={activeImage}
-              alt={item.title}
-              className="img-fluid object-fit-cover"
+        <div
+          className="details-page__main-image"
+          onMouseEnter={() => setShowZoom(true)}
+          onMouseLeave={() => setShowZoom(false)}
+          onMouseMove={handleMouseMove}
+          ref={imgRef}
+        >
+          <img src={activeImage} alt={item.title} />
+
+          {showZoom && (
+            <div
+              className="zoom-lens"
+              style={{
+                top: lensPos.top,
+                left: lensPos.left
+              }}
             />
+          )}
+        </div>
+
+        {showZoom && (
+          <div
+            className="zoom-preview"
+            style={{
+              backgroundImage: `url(${activeImage})`,
+              backgroundPosition: `${zoomPos.x}% ${zoomPos.y}%`
+            }}
+          />
+        )}
+      </div>
+
+      <div className="details-page__info">
+        <div className="condition">
+          {item.condition === "new" ? "Nuevo" : "Usado"} |{" "}
+          {item.sold_quantity > 100 ? "+100" : item.sold_quantity} vendidos
+        </div>
+        <h1 className="title">{item.title}</h1>
+        {item.seller?.name && <div className="seller">Por {item.seller.name}</div>}
+        <div className="price">${item.price.amount.toLocaleString("es-AR")}</div>
+        {item.price.regular_amount && (
+          <div className="regular-price">
+            ${item.price.regular_amount.toLocaleString("es-AR")}
           </div>
-        </div>
-
-        {/* Información */}
-        <div className="col-12 col-md-4">
-          <p className="text-muted mb-2">
-            {item.condition === "new" ? "Nuevo" : "Usado"} · {item.sold_quantity} vendidos
-          </p>
-
-          {item.category_path_from_root?.length > 0 && (
-            <p className="text-muted small mb-3">
-              {item.category_path_from_root.join(" > ")}
-            </p>
-          )}
-
-          <h1 className="h4 mb-3">{item.title}</h1>
-
-          <h2 className="display-6 text-dark mb-3">
-            ${item.price.amount.toLocaleString("es-AR")}
-          </h2>
-
-          {item.price.regular_amount && (
-            <p className="text-muted mb-2">
-              <del>${item.price.regular_amount.toLocaleString("es-AR")}</del>
-            </p>
-          )}
-
-          {item.installments?.quantity && item.installments?.amount && (
-            <p className="text-muted mb-4">
-              {item.installments.quantity} cuotas de $
-              {item.installments.amount.toLocaleString("es-AR")}
-            </p>
-          )}
-
-          <button className="btn btn-primary btn-lg mb-4">Comprar</button>
-        </div>
+        )}
+        {item.installments && (
+          <div className="installments">
+            {item.installments.rate === 0
+              ? `Mismo precio en ${item.installments.quantity} cuotas de $${item.installments.amount.toLocaleString("es-AR")}`
+              : `${item.installments.quantity} cuotas de $${item.installments.amount.toLocaleString("es-AR")} con ${item.installments.rate}% interés`}
+          </div>
+        )}
+        {item.free_shipping && <div className="shipping">Envío gratis</div>}
+        {item.warranty && <div className="warranty">Garantía: {item.warranty}</div>}
+        {item.attributes?.some(attr => attr.id === "COLOR") && (
+          <div className="color">
+            Color: {item.attributes.find(attr => attr.id === "COLOR")?.value_name}
+          </div>
+        )}
+        <button className="buy-button">Comprar</button>
       </div>
 
-      {/* Descripción */}
-      <div className="row mt-5">
-        <div className="col-12">
-          <h3 className="h5 mb-2">Descripción del producto</h3>
-          <p className="text-secondary">
-            {item.description && item.description.length > 10
-              ? item.description
-              : "No se encontró descripción para este producto."}
-          </p>
-        </div>
+      <div className="details-page__info description">
+        <h2>Descripción del producto</h2>
+        <p>{item.description || "No se encontró descripción para este producto."}</p>
       </div>
 
-      {/* Atributos */}
       {item.attributes?.length > 0 && (
-        <div className="row mt-4">
-          <div className="col-12">
-            <h3 className="h5 mb-2">Características</h3>
-            <ul className="list-unstyled">
-              {item.attributes.map((attr) => (
-                <li key={attr.id} className="mb-1">
-                  <strong>{attr.name}:</strong> {attr.value_name}
-                </li>
-              ))}
-            </ul>
-          </div>
+        <div className="details-page__info attributes">
+          <h2>Características</h2>
+          <ul>
+            {item.attributes.map((attr) => (
+              <li key={attr.id}>
+                <strong>{attr.name}:</strong> {attr.value_name}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </div>

@@ -25,7 +25,6 @@ function detectCategory(query) {
   return aliases[normalized] || null;
 }
 
-// Endpoint de búsqueda
 router.get('/', async (req, res) => {
   const { q } = req.query;
   const category = detectCategory(q);
@@ -69,21 +68,21 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Endpoint de detalle
 router.get('/:id', async (req, res) => {
   const id = req.params.id;
 
   for (const category of CATEGORIES) {
     try {
-      const item = JSON.parse(
-        await fs.readFile(path.join(basePath, category, `item-${id}.json`), 'utf8')
-      );
-      const description = JSON.parse(
-        await fs.readFile(path.join(basePath, category, `item-${id}-description.json`), 'utf8')
-      );
-      const categoryData = JSON.parse(
-        await fs.readFile(path.join(basePath, category, `item-${id}-category.json`), 'utf8')
-      );
+      const categoryPath = path.resolve(basePath, category);
+      const item = JSON.parse(await fs.readFile(path.join(categoryPath, `item-${id}.json`), 'utf8'));
+      const description = JSON.parse(await fs.readFile(path.join(categoryPath, `item-${id}-description.json`), 'utf8'));
+      const categoryData = JSON.parse(await fs.readFile(path.join(categoryPath, `item-${id}-category.json`), 'utf8'));
+
+      let sellerData = null;
+      try {
+        const sellerFile = await fs.readFile(path.join(categoryPath, `user-${item.seller_id}.json`), 'utf8');
+        sellerData = JSON.parse(sellerFile);
+      } catch (_) {}
 
       return res.json({
         item: {
@@ -99,15 +98,25 @@ router.get('/:id', async (req, res) => {
           condition: item.condition,
           free_shipping: item.shipping?.free_shipping,
           sold_quantity: item.initial_quantity - (item.available_quantity || 0),
-          installments: item.installments?.quantity + ' cuotas',
+          installments: item.installments
+            ? {
+                quantity: item.installments.quantity,
+                amount: item.installments.amount,
+                rate: item.installments.rate,
+              }
+            : null,
           description: description.plain_text,
-          attributes:
-            item.attributes?.map(attr => ({
-              id: attr.id,
-              name: attr.name,
-              value_name: attr.value_name,
-            })) || [],
+          attributes: item.attributes?.map(attr => ({
+            id: attr.id,
+            name: attr.name,
+            value_name: attr.value_name,
+          })) || [],
           category_path_from_root: categoryData.path_from_root.map(p => p.name),
+          warranty: item.warranty || null,
+          seller: {
+            id: item.seller_id,
+            name: sellerData?.nickname || "Vendedor desconocido",
+          },
         },
       });
     } catch (err) {

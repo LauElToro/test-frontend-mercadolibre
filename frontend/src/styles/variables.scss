@@ -1,25 +1,20 @@
-// Colores principales
-$primary-color: #ffe600; // Fondo header
-$secondary-color: #ebebeb; // Fondo general
+$primary-color: #ffe600;
+$secondary-color: #ebebeb;
 $white: #ffffff;
 $black: #000000;
-$blue: #3483fa; // Links, bordes activos
-$green: #00a650; // Envío gratis, descuento
+$blue: #3483fa; 
+$green: #00a650; 
 
-// Colores de texto
-$text-color: rgba(0, 0, 0, 0.9); // Principal
-$text-secondary-color: rgba(0, 0, 0, 0.55); // Secundario
-$text-disabled-color: rgba(0, 0, 0, 0.3); // Opcional
+$text-color: rgba(0, 0, 0, 0.9);
+$text-secondary-color: rgba(0, 0, 0, 0.55);
+$text-disabled-color: rgba(0, 0, 0, 0.3);
 
-// Tipografías
 $font-family: 'Proxima Nova', 'Roboto', sans-serif;
 
-// Pesos
 $font-weight-light: 300;
 $font-weight-normal: 400;
 $font-weight-semibold: 600;
 
-// Tamaños de fuente
 $font-size-xs: 12px;
 $font-size-sm: 14px;
 $font-size-base: 16px;
@@ -29,7 +24,6 @@ $font-size-xl: 24px;
 $font-size-xxl: 30px;
 $font-size-xxxl: 36px;
 
-// Espaciado general
 $spacing-xxs: 4px;
 $spacing-xs: 6px;
 $spacing-sm: 8px;
@@ -41,14 +35,12 @@ $spacing-3xl: 24px;
 $spacing-4xl: 30px;
 $spacing-5xl: 34px;
 
-// Dimensiones específicas
 $container-width: 1200px;
 $search-bar-width: 1018px;
 $search-bar-height: 34px;
 $product-image-width: 259px;
 $pagination-size: 28px;
 
-// Breakpoints responsive (similar a Bootstrap)
 $breakpoint-xs: 480px;
 $breakpoint-sm: 576px;
 $breakpoint-md: 768px;

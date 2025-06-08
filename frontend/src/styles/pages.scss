@@ -10,16 +10,16 @@
     height: 28px;
     line-height: 28px;
     margin: 0 2px;
-    font-size: $font-size-sm;        /* 14px para links inactivos:contentReference[oaicite:81]{index=81} */
+    font-size: $font-size-sm; 
     font-weight: $font-weight-normal;
     color: $text-secondary-color;
     background: $white;
     border: 1px solid transparent;
     cursor: pointer;
     &--active {
-      border-color: $blue;     /* borde azul para página activa:contentReference[oaicite:82]{index=82} */
-      font-size: $font-size-base;    /* 16px para activo (resaltado):contentReference[oaicite:83]{index=83} */
-      font-weight: $font-weight-semibold; /* semibold 600 activo:contentReference[oaicite:84]{index=84} */
+      border-color: $blue;    
+      font-size: $font-size-base;  
+      font-weight: $font-weight-semibold; 
       color: $text-color;
     }
   }
