@@ -1,12 +1,9 @@
 .search-box {
   position: relative;
-  display: flex;
-  justify-content: center;
   width: 100%;
-  margin-top: 8px;
 
   input[type="text"] {
-    width: 90%;
+    width: 95.5%;
     padding: 10px 40px 10px 12px;
     font-size: 16px;
     border: none;
@@ -28,7 +25,7 @@
 
 button[type="submit"] {
   position: absolute;
-  right: 4%;
+  right: 1%;
   top: 50%;
   transform: translateY(-50%);
   background: none;

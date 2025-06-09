@@ -7,9 +7,14 @@
 @use './details';
 @use './pages';
 
+*{
+  font-family: variables.$font-family;
+  padding: 0;
+  margin: 0;
+}
+
 body {
   background-color: variables.$secondary-color;
-  font-family: variables.$font-family;
   font-size: variables.$font-size-base;
   color: variables.$text-secondary-color;
   margin: 0;

@@ -54,6 +54,13 @@ const Details = () => {
   const visibleThumbnails = 7;
   const extraCount = item.pictures.length - visibleThumbnails;
 
+  const conditionText = item.condition === "new" ? "Nuevo" : "Usado";
+  const soldText = item.sold_quantity > 100 ? "+100" : item.sold_quantity;
+
+  const samePriceInstallments =
+    item.installments &&
+    item.installments.amount * item.installments.quantity === item.price.amount;
+
   return (
     <div className="details-page">
       <div className="details-page__breadcrumbs">
@@ -63,9 +70,9 @@ const Details = () => {
         </div>
       </div>
 
-      {isMobile && item && (
+      {isMobile && (
         <div className="details-page__mobile-header">
-          <div className="condition">{item.condition === "new" ? "Nuevo" : "Usado"} | +{item.sold_quantity}</div>
+          <div className="condition">{conditionText} | +{item.sold_quantity}</div>
           <h1 className="title">{item.title}</h1>
         </div>
       )}
@@ -136,33 +143,41 @@ const Details = () => {
 
       <div className="details-page__info">
         <div className="info-header">
-          <div className="condition">
-            {item.condition === "new" ? "Nuevo" : "Usado"} | {item.sold_quantity > 100 ? "+100" : item.sold_quantity} vendidos
-          </div>
+          <div className="condition">{conditionText} | {soldText} vendidos</div>
           <div className="title-wrapper">
             <h1 className="title">{item.title}</h1>
           </div>
         </div>
+
         {item.seller?.name && <div className="seller">Por {item.seller.name}</div>}
+
         <div className="price">${item.price.amount.toLocaleString("es-AR")}</div>
+
         {item.installments && (
           <div className="installments">
-            Cuota promocionada en {item.installments.quantity} cuotas de <br />
-            ${item.installments.amount.toLocaleString("es-AR")}
+            {samePriceInstallments ? (
+              <>Mismo precio en {item.installments.quantity} cuotas de ${item.installments.amount.toLocaleString("es-AR")}</>
+            ) : (
+              <>{item.installments.quantity} cuotas de ${item.installments.amount.toLocaleString("es-AR")}</>
+            )}
           </div>
         )}
+
         {item.price.regular_amount && (
           <div className="regular-price">
             Precio sin impuestos nacionales: ${item.price.regular_amount.toLocaleString("es-AR")}
           </div>
         )}
+
         {item.free_shipping && <div className="shipping">Envío gratis</div>}
         {item.warranty && <div className="warranty">Garantía: {item.warranty}</div>}
+
         {item.attributes?.some(attr => attr.id === "COLOR") && (
           <div className="color">
             Color: {item.attributes.find(attr => attr.id === "COLOR")?.value_name}
           </div>
         )}
+
         <button className="buy-button">Comprar</button>
       </div>
 

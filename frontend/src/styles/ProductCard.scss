@@ -1,7 +1,7 @@
 .product-card {
   display: flex;
   gap: 16px;
-  padding: 16px;
+  padding: 20px;
   border: 1px solid #e6e6e6;
   border-radius: 8px;
   background-color: #fff;
@@ -30,12 +30,6 @@
         border-radius: 4px;
     }
   }
-  &__info {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    flex: 1;
-  }
 
   &__title {
     font-size: 18px;
@@ -47,7 +41,6 @@
   &__seller {
     font-size: 14px;
     color: #666;
-    margin-bottom: 6px;
   }
 
   &__condition {
@@ -55,7 +48,6 @@
     color: #3483FA;
     font-weight: 600;
     text-transform: uppercase;
-    margin-bottom: 6px;
   }
 
   &__price {
@@ -63,16 +55,15 @@
     font-weight: 700;
     color: #000;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     gap: 8px;
-    margin-bottom: 6px;
   }
-
-  &__regular {
-    font-size: 14px;
+  &__price-regular {
+    color: rgba(0,0,0,0.55);
+    font-size: 12px;
+    font-weight: 400;
     text-decoration: line-through;
-    color: #999;
-    margin-bottom: 2px;
   }
 
   &__discount {
@@ -84,14 +75,12 @@
   &__installments {
     font-size: 14px;
     color: #333;
-    margin-top: 4px;
   }
 
   &__shipping {
     font-size: 14px;
     color: #00a650;
     font-weight: 600;
-    margin-top: 4px;
   }
 
   &__discounted {

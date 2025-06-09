@@ -70,9 +70,30 @@ const ProductCard = ({ item }) => {
           )}
         </div>
 
-        {installments && (
-          <div className="product-card__installments">{installments}</div>
-        )}
+        {installments && (() => {
+          const cuotasMatch = installments.match(/^(\d+)/);
+          const cuotas = cuotasMatch ? parseInt(cuotasMatch[1]) : null;
+
+          if (!cuotas || cuotas <= 0) return null;
+
+          const precioCuota = price.amount / cuotas;
+          const totalCuotas = precioCuota * cuotas;
+          const esPrecioIgual = Math.abs(totalCuotas - price.amount) < 1;
+
+          return (
+            <div className="product-card__installments">
+              {esPrecioIgual
+                ? `Mismo precio en ${cuotas} cuotas de $${precioCuota.toLocaleString("es-AR", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}`
+                : `${cuotas} cuotas de $${precioCuota.toLocaleString("es-AR", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}`}
+            </div>
+          );
+        })()}
 
         {free_shipping && (
           <div className="product-card__shipping">Envío gratis</div>

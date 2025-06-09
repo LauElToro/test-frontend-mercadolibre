@@ -1,7 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Proxima+Nova:300,400,600&display=swap');
 
 .details-page {
-  font-family: 'Proxima Nova', sans-serif;
   max-width: 1200px;
   margin: 2rem auto;
   padding: 1rem;
@@ -129,6 +128,7 @@
     flex-direction: column;
     gap: 8px;
     width: 80px;
+    height: 50px;
 
     @media (max-width: 768px) {
       display: none;
@@ -149,6 +149,7 @@
 
       &.extra {
         img {
+          height: 100%;
           width: 100%;
           object-fit: contain;
           opacity: 0.5;

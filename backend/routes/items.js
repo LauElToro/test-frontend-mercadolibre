@@ -9,6 +9,8 @@ const basePath = path.join(__dirname, '../public');
 
 const CATEGORIES = ['iphone', 'zapatillas', 'camisa', 'cafe', 'arroz'];
 
+const sellerCache = new Map();
+
 function detectCategory(query) {
   const normalized = query.toLowerCase();
   const aliases = {
@@ -45,44 +47,34 @@ router.get('/', async (req, res) => {
     const categories =
       searchData.filters?.find(f => f.id === 'category')?.values?.map(c => c.name) || [];
 
-    const items = await Promise.all(
-      results.map(async item => {
-        let sellerName = null;
+    const items = results.map(item => {
+      const sellerName = item.seller?.nickname || null;
 
-        if (item.seller?.id) {
-          try {
-            const sellerFile = await fs.readFile(
-              path.join(basePath, category, `user-${item.seller.id}.json`),
-              'utf8'
-            );
-            const sellerData = JSON.parse(sellerFile);
-            sellerName = sellerData.nickname;
-          } catch (_) {
-            sellerName = null;
-          }
-        }
+      if (item.seller?.id && sellerName) {
+        sellerCache.set(item.seller.id, sellerName);
+      }
 
-        return {
-          id: item.id,
-          title: item.title,
-          price: {
-            currency: item.currency_id,
-            amount: item.price,
-            decimals: parseFloat((item.price % 1).toFixed(2)),
-            regular_amount: item.original_price || null,
-          },
-          picture: item.thumbnail.replace(/-I\.(jpg|png|webp)$/, "-O.jpg"),
-          condition: item.condition,
-          free_shipping: item.shipping?.free_shipping,
-          installments: item.installments ? `${item.installments.quantity} cuotas` : null,
-          seller: sellerName ? { name: sellerName } : null,
-        };
-      })
-    );
+      return {
+        id: item.id,
+        title: item.title,
+        price: {
+          currency: item.currency_id,
+          amount: item.price,
+          decimals: parseFloat((item.price % 1).toFixed(2)),
+          regular_amount: item.original_price || null,
+        },
+        picture: item.thumbnail.replace(/-I\.(jpg|png|webp)$/, "-O.jpg"),
+        condition: item.condition,
+        free_shipping: item.shipping?.free_shipping || false,
+        installments: item.installments
+          ? `${item.installments.quantity} cuotas`
+          : null,
+        seller: sellerName ? { name: sellerName } : null,
+      };
+    });
 
     res.json({ categories, items });
   } catch (error) {
-    console.error('Error al leer archivo de búsqueda:', error.message);
     res.status(500).json({ error: 'No se pudo leer el archivo de búsqueda.' });
   }
 });
@@ -97,11 +89,7 @@ router.get('/:id', async (req, res) => {
       const description = JSON.parse(await fs.readFile(path.join(categoryPath, `item-${id}-description.json`), 'utf8'));
       const categoryData = JSON.parse(await fs.readFile(path.join(categoryPath, `item-${id}-category.json`), 'utf8'));
 
-      let sellerData = null;
-      try {
-        const sellerFile = await fs.readFile(path.join(categoryPath, `user-${item.seller_id}.json`), 'utf8');
-        sellerData = JSON.parse(sellerFile);
-      } catch (_) {}
+      const sellerName = sellerCache.get(item.seller_id) || "Vendedor desconocido";
 
       return res.json({
         item: {
@@ -134,12 +122,11 @@ router.get('/:id', async (req, res) => {
           warranty: item.warranty || null,
           seller: {
             id: item.seller_id,
-            name: sellerData?.nickname || "Vendedor desconocido",
+            name: sellerName,
           },
         },
       });
     } catch (err) {
-      console.error(`Error al leer item ${id} en categoría ${category}:`, err.message);
       continue;
     }
   }

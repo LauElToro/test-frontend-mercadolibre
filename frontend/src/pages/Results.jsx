@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { fetchItems } from "../utils/api";
 import ProductCard from "../components/ProductCard";
+import Pagination from "../components/pagination";
 import "../styles/results.scss";
 
 const ITEMS_PER_PAGE = 4;
@@ -32,58 +33,21 @@ const Results = () => {
     navigate(`/items?${queryParams.toString()}`);
   };
 
-  const renderPageNumbers = () => {
-    const maxPages = 10;
-    const start = 1;
-    const end = Math.min(maxPages, totalPages);
-    const pages = [];
-
-    for (let i = start; i <= end; i++) {
-      pages.push(
-        <button
-          key={i}
-          className={`pagination__item${i === page ? ' pagination__item--active' : ''}`}
-          onClick={() => handlePageChange(i)}
-        >
-          {i}
-        </button>
-      );
-    }
-    return pages;
-  };
-
   return (
+    <>
     <div className="results-page">
       <div className="results-list">
         {paginatedProducts.map((item) => (
           <ProductCard key={item.id} item={item} />
         ))}
       </div>
-
-      <div className="pagination">
-        <div className="pagination__controls">
-          {page > 1 && (
-            <button
-              className="pagination__button"
-              onClick={() => handlePageChange(page - 1)}
-            >
-              {"<"} Anterior
-            </button>
-          )}
-
-          {renderPageNumbers()}
-
-          {page < totalPages && (
-            <button
-              className="pagination__button"
-              onClick={() => handlePageChange(page + 1)}
-            >
-              Siguiente{">"}
-            </button>
-          )}
-        </div>
-      </div>
     </div>
+    <Pagination
+        currentPage={page}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
+    </>
   );
 };
 
