@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { fetchItems } from "../utils/api";
 import ProductCard from "../components/ProductCard";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import "../styles/results.scss";
 
-const ITEMS_PER_PAGE = 3;
+const ITEMS_PER_PAGE = 4;
 
 const Results = () => {
   const location = useLocation();
@@ -32,43 +32,57 @@ const Results = () => {
     navigate(`/items?${queryParams.toString()}`);
   };
 
-  return (
-    <div className="container my-4">
-      <h2 className="mb-4 text-dark">Resultados para: “{query}”</h2>
+  const renderPageNumbers = () => {
+    const maxPages = 10;
+    const start = 1;
+    const end = Math.min(maxPages, totalPages);
+    const pages = [];
 
-      <div className="row gy-4">
-        {paginatedProducts.map(item => (
-          <div key={item.id} className="col-12">
-            <ProductCard item={item} />
-          </div>
+    for (let i = start; i <= end; i++) {
+      pages.push(
+        <button
+          key={i}
+          className={`pagination__item${i === page ? ' pagination__item--active' : ''}`}
+          onClick={() => handlePageChange(i)}
+        >
+          {i}
+        </button>
+      );
+    }
+    return pages;
+  };
+
+  return (
+    <div className="results-page">
+      <div className="results-list">
+        {paginatedProducts.map((item) => (
+          <ProductCard key={item.id} item={item} />
         ))}
       </div>
 
-      <nav className="mt-4">
-        <ul className="pagination justify-content-center">
-          <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
+      <div className="pagination">
+        <div className="pagination__controls">
+          {page > 1 && (
             <button
-              className="page-link"
+              className="pagination__button"
               onClick={() => handlePageChange(page - 1)}
             >
-              Anterior
+              {"<"} Anterior
             </button>
-          </li>
-          <li className="page-item disabled">
-            <span className="page-link">
-              Página {page} de {totalPages}
-            </span>
-          </li>
-          <li className={`page-item ${page >= totalPages ? "disabled" : ""}`}>
+          )}
+
+          {renderPageNumbers()}
+
+          {page < totalPages && (
             <button
-              className="page-link"
+              className="pagination__button"
               onClick={() => handlePageChange(page + 1)}
             >
-              Siguiente
+              Siguiente{">"}
             </button>
-          </li>
-        </ul>
-      </nav>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

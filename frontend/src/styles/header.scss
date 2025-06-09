@@ -1,26 +1,36 @@
-/* Estilos globales y del header */
-@import url('https://fonts.googleapis.com/css?family=Proxima+Nova:300,400,600&display=swap');
-
-body {
-  font-family: 'Proxima Nova', sans-serif;  /* Fuente Proxima Nova global :contentReference[oaicite:18]{index=18} */
-  background-color: #EBEBEB;               /* Fondo de página gris claro :contentReference[oaicite:19]{index=19} */
-  margin: 0;
-}
-
 .header {
-  background-color: #FFE600;  /* Fondo amarillo corporativo :contentReference[oaicite:20]{index=20} */
+  background-color: #FFE600;
+
   .container {
-    max-width: 1200px;        /* Ancho máximo según diseño :contentReference[oaicite:21]{index=21} */
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 8px 16px;        /* Espacio interno para separación (8px sup/inf):contentReference[oaicite:22]{index=22} */
+    padding: 8px 16px;
     display: flex;
     align-items: center;
+    gap: 16px;
   }
+
   .logo {
     text-decoration: none;
   }
+
   .logo-img {
-    max-height: 40px;   /* Ajuste de altura máx para alinear con barra de búsqueda */
+    max-height: 40px;
     height: auto;
   }
 }
+  @media (max-width: 768px) {
+    .container {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+    }
+
+    .logo {
+      justify-content: center;
+    }
+
+    .logo-img {
+      max-height: 32px;
+    }
+  }

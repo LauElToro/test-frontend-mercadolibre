@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { fetchItemDetail } from "../utils/api";
+import MobileCarousel from "../components/MobileCarousel";
+import PhotoModal from "../components/PhotoModal";
 import "../styles/Details.scss";
 
 const Details = () => {
@@ -10,7 +12,16 @@ const Details = () => {
   const [showZoom, setShowZoom] = useState(false);
   const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });
   const [lensPos, setLensPos] = useState({ top: 0, left: 0 });
+  const [isPhotoModalOpen, setPhotoModalOpen] = useState(false);
+  const [modalIndex, setModalIndex] = useState(0);
   const imgRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     fetchItemDetail(id)
@@ -33,7 +44,15 @@ const Details = () => {
     setLensPos({ top: offsetY, left: offsetX });
   };
 
+  const openModalAt = (index) => {
+    setModalIndex(index);
+    setPhotoModalOpen(true);
+  };
+
   if (!item) return <div className="text-center py-5">Cargando detalle...</div>;
+
+  const visibleThumbnails = 7;
+  const extraCount = item.pictures.length - visibleThumbnails;
 
   return (
     <div className="details-page">
@@ -44,40 +63,67 @@ const Details = () => {
         </div>
       </div>
 
+      {isMobile && item && (
+        <div className="details-page__mobile-header">
+          <div className="condition">{item.condition === "new" ? "Nuevo" : "Usado"} | +{item.sold_quantity}</div>
+          <h1 className="title">{item.title}</h1>
+        </div>
+      )}
+
       <div className="details-page__gallery">
-        <div className="details-page__thumbnails">
-          {item.pictures.map((pic) => (
-            <img
-              key={pic}
-              src={pic}
-              alt={item.title}
-              className={`details-page__thumb ${pic === activeImage ? "active" : ""}`}
-              onMouseEnter={() => setActiveImage(pic)}
-            />
-          ))}
-        </div>
+        {!isMobile && (
+          <div className="details-page__thumbnails">
+            {item.pictures.slice(0, visibleThumbnails).map((pic, index) => (
+              <img
+                key={pic}
+                src={pic}
+                alt={item.title}
+                className={`details-page__thumb ${pic === activeImage ? "active" : ""}`}
+                onMouseEnter={() => setActiveImage(pic)}
+                onClick={() => openModalAt(index)}
+              />
+            ))}
+            {extraCount > 0 && item.pictures[visibleThumbnails] && (
+              <div
+                className="details-page__thumb extra"
+                onClick={() => openModalAt(visibleThumbnails)}
+              >
+                <img src={item.pictures[visibleThumbnails]} alt="extra" />
+                <div className="extra-overlay">+{extraCount}</div>
+              </div>
+            )}
+          </div>
+        )}
 
-        <div
-          className="details-page__main-image"
-          onMouseEnter={() => setShowZoom(true)}
-          onMouseLeave={() => setShowZoom(false)}
-          onMouseMove={handleMouseMove}
-          ref={imgRef}
-        >
-          <img src={activeImage} alt={item.title} />
+        {isMobile && (
+          <MobileCarousel
+            pictures={item.pictures}
+            activeImage={activeImage}
+            setActiveImage={setActiveImage}
+            onImageClick={(index) => openModalAt(index)}
+          />
+        )}
 
-          {showZoom && (
-            <div
-              className="zoom-lens"
-              style={{
-                top: lensPos.top,
-                left: lensPos.left
-              }}
-            />
-          )}
-        </div>
+        {!isMobile && (
+          <div
+            className="details-page__main-image"
+            onClick={() => openModalAt(item.pictures.indexOf(activeImage))}
+            onMouseEnter={() => setShowZoom(true)}
+            onMouseLeave={() => setShowZoom(false)}
+            onMouseMove={handleMouseMove}
+            ref={imgRef}
+          >
+            <img src={activeImage} alt={item.title} />
+            {showZoom && (
+              <div
+                className="zoom-lens"
+                style={{ top: lensPos.top, left: lensPos.left }}
+              />
+            )}
+          </div>
+        )}
 
-        {showZoom && (
+        {!isMobile && showZoom && (
           <div
             className="zoom-preview"
             style={{
@@ -89,23 +135,25 @@ const Details = () => {
       </div>
 
       <div className="details-page__info">
-        <div className="condition">
-          {item.condition === "new" ? "Nuevo" : "Usado"} |{" "}
-          {item.sold_quantity > 100 ? "+100" : item.sold_quantity} vendidos
+        <div className="info-header">
+          <div className="condition">
+            {item.condition === "new" ? "Nuevo" : "Usado"} | {item.sold_quantity > 100 ? "+100" : item.sold_quantity} vendidos
+          </div>
+          <div className="title-wrapper">
+            <h1 className="title">{item.title}</h1>
+          </div>
         </div>
-        <h1 className="title">{item.title}</h1>
         {item.seller?.name && <div className="seller">Por {item.seller.name}</div>}
         <div className="price">${item.price.amount.toLocaleString("es-AR")}</div>
-        {item.price.regular_amount && (
-          <div className="regular-price">
-            ${item.price.regular_amount.toLocaleString("es-AR")}
-          </div>
-        )}
         {item.installments && (
           <div className="installments">
-            {item.installments.rate === 0
-              ? `Mismo precio en ${item.installments.quantity} cuotas de $${item.installments.amount.toLocaleString("es-AR")}`
-              : `${item.installments.quantity} cuotas de $${item.installments.amount.toLocaleString("es-AR")} con ${item.installments.rate}% interés`}
+            Cuota promocionada en {item.installments.quantity} cuotas de <br />
+            ${item.installments.amount.toLocaleString("es-AR")}
+          </div>
+        )}
+        {item.price.regular_amount && (
+          <div className="regular-price">
+            Precio sin impuestos nacionales: ${item.price.regular_amount.toLocaleString("es-AR")}
           </div>
         )}
         {item.free_shipping && <div className="shipping">Envío gratis</div>}
@@ -123,17 +171,12 @@ const Details = () => {
         <p>{item.description || "No se encontró descripción para este producto."}</p>
       </div>
 
-      {item.attributes?.length > 0 && (
-        <div className="details-page__info attributes">
-          <h2>Características</h2>
-          <ul>
-            {item.attributes.map((attr) => (
-              <li key={attr.id}>
-                <strong>{attr.name}:</strong> {attr.value_name}
-              </li>
-            ))}
-          </ul>
-        </div>
+      {isPhotoModalOpen && (
+        <PhotoModal
+          pictures={item.pictures}
+          startIndex={modalIndex}
+          onClose={() => setPhotoModalOpen(false)}
+        />
       )}
     </div>
   );

@@ -35,7 +35,6 @@ router.get('/', async (req, res) => {
 
   try {
     const filePath = path.join(basePath, category, `search-MLA-${category}.json`);
-    console.log(`Buscando archivo: ${filePath}`);
     const file = await fs.readFile(filePath, 'utf8');
     const searchData = JSON.parse(file);
 
@@ -46,20 +45,40 @@ router.get('/', async (req, res) => {
     const categories =
       searchData.filters?.find(f => f.id === 'category')?.values?.map(c => c.name) || [];
 
-    const items = results.map(item => ({
-      id: item.id,
-      title: item.title,
-      price: {
-        currency: item.currency_id,
-        amount: item.price,
-        decimals: parseFloat((item.price % 1).toFixed(2)),
-        regular_amount: item.original_price || null,
-      },
-      picture: item.thumbnail,
-      condition: item.condition,
-      free_shipping: item.shipping?.free_shipping,
-      installments: item.installments?.quantity + ' cuotas',
-    }));
+    const items = await Promise.all(
+      results.map(async item => {
+        let sellerName = null;
+
+        if (item.seller?.id) {
+          try {
+            const sellerFile = await fs.readFile(
+              path.join(basePath, category, `user-${item.seller.id}.json`),
+              'utf8'
+            );
+            const sellerData = JSON.parse(sellerFile);
+            sellerName = sellerData.nickname;
+          } catch (_) {
+            sellerName = null;
+          }
+        }
+
+        return {
+          id: item.id,
+          title: item.title,
+          price: {
+            currency: item.currency_id,
+            amount: item.price,
+            decimals: parseFloat((item.price % 1).toFixed(2)),
+            regular_amount: item.original_price || null,
+          },
+          picture: item.thumbnail.replace(/-I\.(jpg|png|webp)$/, "-O.jpg"),
+          condition: item.condition,
+          free_shipping: item.shipping?.free_shipping,
+          installments: item.installments ? `${item.installments.quantity} cuotas` : null,
+          seller: sellerName ? { name: sellerName } : null,
+        };
+      })
+    );
 
     res.json({ categories, items });
   } catch (error) {

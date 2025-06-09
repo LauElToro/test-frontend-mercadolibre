@@ -1,46 +1,84 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import "../styles/productcard.scss";
+import { useNavigate } from "react-router-dom";
+import "../styles/ProductCard.scss";
 
 const ProductCard = ({ item }) => {
+  const navigate = useNavigate();
+
   if (!item || !item.id) return null;
 
   const {
     id,
     title,
-    price,
     picture,
+    price,
     condition,
     free_shipping,
     installments,
+    seller,
   } = item;
 
+  const handleClick = () => {
+    navigate(`/items/${id}`);
+  };
+
+  const isReconditioned = condition === "reconditioned" || condition === "refurbished";
+  const hasDiscount = price?.regular_amount > price?.amount;
+  const discountPercent = hasDiscount
+    ? Math.round(((price.regular_amount - price.amount) / price.regular_amount) * 100)
+    : 0;
+
   return (
-    <Link to={`/items/${id}`} className="product-card">
+    <div className="product-card" onClick={handleClick}>
       <div className="product-card__image">
-        <img src={picture} alt={title} />
+        <img
+          src={picture}
+          alt={title}
+          className="product-card__img"
+          loading="lazy"
+        />
       </div>
+
       <div className="product-card__info">
-        <h3 className="product-card__title">{title}</h3>
-        <p className="product-card__price">
-          {price?.currency} ${price?.amount}
-          {price?.regular_amount && (
-            <span className="product-card__regular">
-              ${price.regular_amount}
-            </span>
-          )}
-        </p>
-        {installments && (
-          <p className="product-card__installments">{installments}</p>
+        {isReconditioned && (
+          <div className="product-card__condition">Reacondicionado</div>
         )}
-        <p className="product-card__condition">
-          Estado: {condition === "new" ? "Nuevo" : "Usado"}
-        </p>
+
+        <h3 className="product-card__title">{title}</h3>
+
+        {seller?.name && (
+          <div className="product-card__seller">Por {seller.name}</div>
+        )}
+
+        <div className="product-card__price">
+          {hasDiscount && (
+            <>
+              <div className="product-card__price-regular">
+                ${price.regular_amount.toLocaleString("es-AR")}
+              </div>
+              <div className="product-card__price-current">
+                ${price.amount.toLocaleString("es-AR")}
+                <span className="product-card__discount"> {discountPercent}% OFF</span>
+              </div>
+            </>
+          )}
+
+          {!hasDiscount && (
+            <div className="product-card__price-current">
+              ${price.amount.toLocaleString("es-AR")}
+            </div>
+          )}
+        </div>
+
+        {installments && (
+          <div className="product-card__installments">{installments}</div>
+        )}
+
         {free_shipping && (
-          <p className="product-card__shipping">🚚 Envío gratis</p>
+          <div className="product-card__shipping">Envío gratis</div>
         )}
       </div>
-    </Link>
+    </div>
   );
 };
 
