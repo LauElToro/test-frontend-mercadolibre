@@ -53,147 +53,184 @@ const Details = () => {
 
   const visibleThumbnails = 7;
   const extraCount = item.pictures.length - visibleThumbnails;
-
   const conditionText = item.condition === "new" ? "Nuevo" : "Usado";
-  const soldText = item.sold_quantity > 100 ? "+100" : item.sold_quantity;
+  const soldText = item.sold_quantity > 0 ? `${item.sold_quantity} vendidos` : "";
 
-  const samePriceInstallments =
+  const regularPrice = item.price.regular_amount;
+  const currentPrice = item.price.amount;
+  const showDiscount = regularPrice && regularPrice > currentPrice;
+  const discountPercent = showDiscount
+    ? Math.round(100 - (currentPrice / regularPrice) * 100)
+    : 0;
+
+  const showInstallments =
     item.installments &&
-    item.installments.amount * item.installments.quantity === item.price.amount;
+    typeof item.installments.amount === "number" &&
+    typeof item.installments.quantity === "number";
+
+  const cuotas = showInstallments ? item.installments.quantity : 0;
+  const montoCuota = showInstallments ? item.installments.amount : 0;
+  const totalCuotas = cuotas * montoCuota;
+  const mismoPrecio = Math.abs(currentPrice - totalCuotas) < 1;
 
   return (
-    <div className="details-page">
-      <div className="details-page__breadcrumbs">
-        <Link to="/" className="breadcrumbs-link">Volver al listado</Link>
-        <div className="breadcrumbs-path">
-          {item.category_path_from_root?.join(" > ")}
+    <>
+      <div className="details-page__topbar">
+        <div className="breadcrumbs-wrapper">
+          <Link to="/" className="breadcrumbs-link">Volver al listado</Link>
+          <span className="separator">|</span>
+          <div className="breadcrumbs-path">
+            {item.category_path_from_root?.join(" > ")}
+          </div>
         </div>
+        <div className="publication-id"><p>Publicación:</p> <span>#{item.id}</span></div>
       </div>
 
-      {isMobile && (
-        <div className="details-page__mobile-header">
-          <div className="condition">{conditionText} | +{item.sold_quantity}</div>
-          <h1 className="title">{item.title}</h1>
-        </div>
-      )}
-
-      <div className="details-page__gallery">
-        {!isMobile && (
-          <div className="details-page__thumbnails">
-            {item.pictures.slice(0, visibleThumbnails).map((pic, index) => (
-              <img
-                key={pic}
-                src={pic}
-                alt={item.title}
-                className={`details-page__thumb ${pic === activeImage ? "active" : ""}`}
-                onMouseEnter={() => setActiveImage(pic)}
-                onClick={() => openModalAt(index)}
-              />
-            ))}
-            {extraCount > 0 && item.pictures[visibleThumbnails] && (
-              <div
-                className="details-page__thumb extra"
-                onClick={() => openModalAt(visibleThumbnails)}
-              >
-                <img src={item.pictures[visibleThumbnails]} alt="extra" />
-                <div className="extra-overlay">+{extraCount}</div>
-              </div>
-            )}
-          </div>
-        )}
-
+      <div className="details-page">
         {isMobile && (
-          <MobileCarousel
-            pictures={item.pictures}
-            activeImage={activeImage}
-            setActiveImage={setActiveImage}
-            onImageClick={(index) => openModalAt(index)}
-          />
-        )}
-
-        {!isMobile && (
-          <div
-            className="details-page__main-image"
-            onClick={() => openModalAt(item.pictures.indexOf(activeImage))}
-            onMouseEnter={() => setShowZoom(true)}
-            onMouseLeave={() => setShowZoom(false)}
-            onMouseMove={handleMouseMove}
-            ref={imgRef}
-          >
-            <img src={activeImage} alt={item.title} />
-            {showZoom && (
-              <div
-                className="zoom-lens"
-                style={{ top: lensPos.top, left: lensPos.left }}
-              />
-            )}
-          </div>
-        )}
-
-        {!isMobile && showZoom && (
-          <div
-            className="zoom-preview"
-            style={{
-              backgroundImage: `url(${activeImage})`,
-              backgroundPosition: `${zoomPos.x}% ${zoomPos.y}%`
-            }}
-          />
-        )}
-      </div>
-
-      <div className="details-page__info">
-        <div className="info-header">
-          <div className="condition">{conditionText} | {soldText} vendidos</div>
-          <div className="title-wrapper">
+          <div className="details-page__mobile-header">
+            <div className="condition">{conditionText}{soldText ? ` | ${soldText}` : ""}</div>
             <h1 className="title">{item.title}</h1>
           </div>
+        )}
+
+        <div className="details-page__gallery">
+          {!isMobile && (
+            <div className="details-page__thumbnails">
+              {item.pictures.slice(0, visibleThumbnails).map((pic, index) => (
+                <img
+                  key={pic}
+                  src={pic}
+                  alt={item.title}
+                  className={`details-page__thumb ${pic === activeImage ? "active" : ""}`}
+                  onMouseEnter={() => setActiveImage(pic)}
+                  onClick={() => openModalAt(index)}
+                />
+              ))}
+              {extraCount > 0 && item.pictures[visibleThumbnails] && (
+                <div
+                  className="details-page__thumb extra"
+                  onClick={() => openModalAt(visibleThumbnails)}
+                >
+                  <img src={item.pictures[visibleThumbnails]} alt="extra" />
+                  <div className="extra-overlay">+{extraCount}</div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {isMobile && (
+            <MobileCarousel
+              pictures={item.pictures}
+              activeImage={activeImage}
+              setActiveImage={setActiveImage}
+              onImageClick={(index) => openModalAt(index)}
+            />
+          )}
+
+          {!isMobile && (
+            <div
+              className="details-page__main-image"
+              onClick={() => openModalAt(item.pictures.indexOf(activeImage))}
+              onMouseEnter={() => setShowZoom(true)}
+              onMouseLeave={() => setShowZoom(false)}
+              onMouseMove={handleMouseMove}
+              ref={imgRef}
+            >
+              <img src={activeImage} alt={item.title} />
+              {showZoom && (
+                <div
+                  className="zoom-lens"
+                  style={{ top: lensPos.top, left: lensPos.left }}
+                />
+              )}
+            </div>
+          )}
+
+          {!isMobile && showZoom && (
+            <div
+              className="zoom-preview"
+              style={{
+                backgroundImage: `url(${activeImage})`,
+                backgroundPosition: `${zoomPos.x}% ${zoomPos.y}%`
+              }}
+            />
+          )}
         </div>
 
-        {item.seller?.name && <div className="seller">Por {item.seller.name}</div>}
+        <div className="details-page__info">
+          <div className="info-header">
+            <div className="condition"><span>{conditionText}{soldText ? ` | ${soldText}` : ""}</span></div>
+            <div className="title-wrapper">
+              <h1 className="title">{item.title}</h1>
+              {item.seller?.name && <div className="seller">Por {item.seller.name}</div>}
+            </div>
+          </div>
 
-        <div className="price">${item.price.amount.toLocaleString("es-AR")}</div>
+          
 
-        {item.installments && (
-          <div className="installments">
-            {samePriceInstallments ? (
-              <>Mismo precio en {item.installments.quantity} cuotas de ${item.installments.amount.toLocaleString("es-AR")}</>
+          <div className="price-block">
+            {showDiscount ? (
+              <>
+              <div className="price-regular">
+                  ${regularPrice.toLocaleString("es-AR")}
+                </div>
+                <div className="price">
+                  ${currentPrice.toLocaleString("es-AR")}{" "}
+                  <span className="discount">{discountPercent}% OFF</span>
+                </div>
+              </>
             ) : (
-              <>{item.installments.quantity} cuotas de ${item.installments.amount.toLocaleString("es-AR")}</>
+              <div className="price">
+                ${currentPrice.toLocaleString("es-AR")}
+                <div className="price-regular">Sin descuento</div>
+              </div>
+            )}
+
+            {showInstallments ? (
+              <div className="installments">
+                {mismoPrecio
+                  ? `Mismo precio en ${cuotas} cuotas de $${montoCuota.toLocaleString("es-AR", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}`
+                  : `${cuotas} cuotas de $${montoCuota.toLocaleString("es-AR", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}`}
+              </div>
+            ) : (
+              <div className="installments">Sin cuotas</div>
             )}
           </div>
+
+          {item.free_shipping && <div className="shipping">Envío gratis</div>}
+
+          {item.attributes?.some(attr => attr.id === "COLOR") && (
+            <div className="color">
+             <p>Color:</p> <span>{item.attributes.find(attr => attr.id === "COLOR")?.value_name}</span>
+            </div>
+          )}
+        </div>
+
+        <div className="details-page__info description">
+          <h2>Descripción</h2>
+          {item.description?.split(/\n+/)
+            .filter(paragraph => paragraph.trim() !== '')
+            .map((paragraph, idx) => (
+              <p key={idx}>{paragraph.trim()}</p>
+            ))}
+        </div>
+
+        {isPhotoModalOpen && (
+          <PhotoModal
+            pictures={item.pictures}
+            startIndex={modalIndex}
+            onClose={() => setPhotoModalOpen(false)}
+          />
         )}
-
-        {item.price.regular_amount && (
-          <div className="regular-price">
-            Precio sin impuestos nacionales: ${item.price.regular_amount.toLocaleString("es-AR")}
-          </div>
-        )}
-
-        {item.free_shipping && <div className="shipping">Envío gratis</div>}
-        {item.warranty && <div className="warranty">Garantía: {item.warranty}</div>}
-
-        {item.attributes?.some(attr => attr.id === "COLOR") && (
-          <div className="color">
-            Color: {item.attributes.find(attr => attr.id === "COLOR")?.value_name}
-          </div>
-        )}
-
-        <button className="buy-button">Comprar</button>
       </div>
-
-      <div className="details-page__info description">
-        <h2>Descripción del producto</h2>
-        <p>{item.description || "No se encontró descripción para este producto."}</p>
-      </div>
-
-      {isPhotoModalOpen && (
-        <PhotoModal
-          pictures={item.pictures}
-          startIndex={modalIndex}
-          onClose={() => setPhotoModalOpen(false)}
-        />
-      )}
-    </div>
+    </>
   );
 };
 

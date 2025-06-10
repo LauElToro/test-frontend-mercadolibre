@@ -8,8 +8,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const basePath = path.join(__dirname, '../public');
 
 const CATEGORIES = ['iphone', 'zapatillas', 'camisa', 'cafe', 'arroz'];
-
 const sellerCache = new Map();
+const itemCache = new Map();
 
 function detectCategory(query) {
   const normalized = query.toLowerCase();
@@ -54,6 +54,12 @@ router.get('/', async (req, res) => {
         sellerCache.set(item.seller.id, sellerName);
       }
 
+      itemCache.set(item.id, {
+        price: item.price,
+        installments: item.installments || null,
+        free_shipping: item.shipping?.free_shipping || false,
+      });
+
       return {
         id: item.id,
         title: item.title,
@@ -61,7 +67,7 @@ router.get('/', async (req, res) => {
           currency: item.currency_id,
           amount: item.price,
           decimals: parseFloat((item.price % 1).toFixed(2)),
-          regular_amount: item.original_price || null,
+          regular_amount: null,
         },
         picture: item.thumbnail.replace(/-I\.(jpg|png|webp)$/, "-O.jpg"),
         condition: item.condition,
@@ -85,11 +91,36 @@ router.get('/:id', async (req, res) => {
   for (const category of CATEGORIES) {
     try {
       const categoryPath = path.resolve(basePath, category);
-      const item = JSON.parse(await fs.readFile(path.join(categoryPath, `item-${id}.json`), 'utf8'));
-      const description = JSON.parse(await fs.readFile(path.join(categoryPath, `item-${id}-description.json`), 'utf8'));
-      const categoryData = JSON.parse(await fs.readFile(path.join(categoryPath, `item-${id}-category.json`), 'utf8'));
+      const itemFile = path.join(categoryPath, `item-${id}.json`);
+      const descriptionFile = path.join(categoryPath, `item-${id}-description.json`);
+      const categoryFile = path.join(categoryPath, `item-${id}-category.json`);
 
+      const item = JSON.parse(await fs.readFile(itemFile, 'utf8'));
+      const description = JSON.parse(await fs.readFile(descriptionFile, 'utf8'));
+      const categoryData = JSON.parse(await fs.readFile(categoryFile, 'utf8'));
+
+      const fallback = itemCache.get(item.id) || {};
       const sellerName = sellerCache.get(item.seller_id) || "Vendedor desconocido";
+
+      const price = item.price ?? fallback.price ?? 0;
+      const installments = item.installments ?? fallback.installments ?? null;
+
+      const cuotasTotal = installments
+        ? installments.quantity * installments.amount
+        : null;
+
+      const hasInstallmentDiscount = cuotasTotal && cuotasTotal < price;
+
+      const discountedPrice = hasInstallmentDiscount
+        ? Math.round(cuotasTotal)
+        : price;
+
+      const regularPrice = hasInstallmentDiscount ? price : null;
+
+      const sold_quantity =
+        typeof item.sold_quantity === "number" && item.sold_quantity > 0
+          ? item.sold_quantity
+          : 25; 
 
       return res.json({
         item: {
@@ -97,28 +128,22 @@ router.get('/:id', async (req, res) => {
           title: item.title,
           price: {
             currency: item.currency_id,
-            amount: item.price,
-            decimals: parseFloat((item.price % 1).toFixed(2)),
-            regular_amount: item.original_price || null,
+            amount: discountedPrice,
+            decimals: parseFloat((discountedPrice % 1).toFixed(2)),
+            regular_amount: regularPrice,
           },
-          pictures: item.pictures.map(p => p.secure_url),
+          pictures: item.pictures.map((p) => p.secure_url),
           condition: item.condition,
-          free_shipping: item.shipping?.free_shipping,
-          sold_quantity: item.initial_quantity - (item.available_quantity || 0),
-          installments: item.installments
-            ? {
-                quantity: item.installments.quantity,
-                amount: item.installments.amount,
-                rate: item.installments.rate,
-              }
-            : null,
+          free_shipping: item.shipping?.free_shipping ?? fallback.free_shipping ?? false,
+          sold_quantity,
+          installments: installments || null,
           description: description.plain_text,
-          attributes: item.attributes?.map(attr => ({
+          attributes: item.attributes?.map((attr) => ({
             id: attr.id,
             name: attr.name,
             value_name: attr.value_name,
           })) || [],
-          category_path_from_root: categoryData.path_from_root.map(p => p.name),
+          category_path_from_root: categoryData.path_from_root.map((p) => p.name),
           warranty: item.warranty || null,
           seller: {
             id: item.seller_id,

@@ -1,9 +1,9 @@
-const API_BASE_URL = "http://localhost:3000/api";
+const API_BASE_URL = "http://localhost:3000/api/items";
 
 export const fetchItems = async (query) => {
-  const res = await fetch(`http://localhost:3000/api/items?q=${query}`);
+  const res = await fetch(`${API_BASE_URL}?q=${encodeURIComponent(query)}`);
   if (!res.ok) throw new Error("Error al buscar productos");
-  
+
   const data = await res.json();
 
   return {
@@ -13,7 +13,7 @@ export const fetchItems = async (query) => {
 };
 
 export const fetchItemDetail = async (id) => {
-  const res = await fetch(`http://localhost:3000/api/items/${id}`);
+  const res = await fetch(`${API_BASE_URL}/${id}`);
   if (!res.ok) throw new Error("Error al obtener detalle del producto");
   const data = await res.json();
   return data;
