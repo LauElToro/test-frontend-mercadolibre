@@ -32,9 +32,7 @@ Este proyecto utiliza una arquitectura fullstack con dos carpetas separadas:
 ### 🔧 Servidor (Backend)
 - Node.js v20+
 - Express
-- Axios para consumo externo
-- Proxy de autenticación con soporte para ACCESS TOKEN
-- MOCKS opcionales
+- MOCKS
 
 ---
 
@@ -83,7 +81,7 @@ npm run dev
 - [x] Formato de precios, moneda y cuotas
 - [x] Responsive Design
 - [x] Mensaje de bienvenida (primera visita)
-- [x] SEO friendly (etiquetas y metadatos)
+- [x] SEO friendly (etiquetas y metadatos) + react-helmet-async
 - [x] Arquitectura escalable
 
 ---
@@ -101,8 +99,8 @@ Formato estructurado para el frontend.
 - [x] Mensaje de bienvenida en primer ingreso
 - [x] Control de estado para evitar múltiples llamadas innecesarias
 - [x] Soporte para paginación con `offset`
-- [ ] Componente de paginación visual
-- [ ] Caching de resultados por sesión
+- [x] Componente de paginación visual
+- [x] Caching de resultados por sesión
 
 ---
 
