@@ -28,19 +28,16 @@ const ProductCard = ({ item }) => {
   const currentPrice = price?.amount || 0;
   let regularPrice = price?.regular_amount;
 
-  // Extraer número de cuotas desde string tipo "12 cuotas"
   let cuotas = 0;
   if (typeof installments === "string") {
     const match = installments.match(/^(\d+)/);
     cuotas = match ? parseInt(match[1], 10) : 0;
   }
 
-  // Calcular valor de cuota
   const precioCuota = cuotas > 0 ? currentPrice / cuotas : 0;
   const totalCuotas = precioCuota * cuotas;
   const esPrecioIgual = Math.abs(totalCuotas - currentPrice) < 1;
 
-  // Solo infiere regularPrice si hay recargo por cuotas
   const inferredRegularPrice =
     !regularPrice && !esPrecioIgual && totalCuotas > currentPrice
       ? Math.round(totalCuotas)

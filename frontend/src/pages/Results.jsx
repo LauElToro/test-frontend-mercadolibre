@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { fetchItems } from "../utils/api";
 import ProductCard from "../components/ProductCard";
 import Pagination from "../components/pagination";
@@ -35,14 +36,22 @@ const Results = () => {
 
   return (
     <>
-    <div className="results-page">
-      <div className="results-list">
-        {paginatedProducts.map((item) => (
-          <ProductCard key={item.id} item={item} />
-        ))}
-      </div>
-    </div>
-    <Pagination
+      <Helmet>
+        <title>Resultados para "{query}" | Tu Marca</title>
+        <meta name="description" content={`Encontrá los mejores resultados para "${query}". Ofertas, envíos gratis y cuotas sin interés.`} />
+        <meta property="og:title" content={`Resultados para "${query}"`} />
+        <meta property="og:description" content={`Productos disponibles para "${query}".`} />
+      </Helmet>
+
+      <main className="results-page" role="main">
+        <div className="results-list">
+          {paginatedProducts.map((item) => (
+            <ProductCard key={item.id} item={item} />
+          ))}
+        </div>
+      </main>
+
+      <Pagination
         currentPage={page}
         totalPages={totalPages}
         onPageChange={handlePageChange}

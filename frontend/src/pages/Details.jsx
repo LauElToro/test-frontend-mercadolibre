@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { fetchItemDetail } from "../utils/api";
 import MobileCarousel from "../components/MobileCarousel";
 import PhotoModal from "../components/PhotoModal";
+import { Helmet } from 'react-helmet-async';
 import "../styles/Details.scss";
 
 const Details = () => {
@@ -75,6 +76,41 @@ const Details = () => {
 
   return (
     <>
+<Helmet>
+  <title>{item.title}</title>
+  <meta name="description" content={`Comprá ${item.title} al mejor precio. ${conditionText}. ${soldText}`} />
+
+  <meta property="og:title" content={item.title} />
+  <meta property="og:description" content={item.description?.slice(0, 160)} />
+  <meta property="og:image" content={item.pictures?.[0]} />
+  <meta property="og:type" content="product" />
+  <meta property="og:url" content={window.location.href} />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={item.title} />
+  <meta name="twitter:description" content={item.description?.slice(0, 160)} />
+  <meta name="twitter:image" content={item.pictures?.[0]} />
+    <script type="application/ld+json">
+      {JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Product",
+        name: item.title,
+        image: item.pictures,
+        description: item.description?.slice(0, 200),
+        brand: item.seller?.name || "Marca genérica",
+        offers: {
+          "@type": "Offer",
+          priceCurrency: "ARS",
+          price: currentPrice,
+          availability: "https://schema.org/InStock",
+          itemCondition:
+            item.condition === "new"
+              ? "https://schema.org/NewCondition"
+              : "https://schema.org/UsedCondition",
+        },
+      })}
+    </script>
+  </Helmet>
       <div className="details-page__topbar">
         <div className="breadcrumbs-wrapper">
           <Link to="/" className="breadcrumbs-link">Volver al listado</Link>
