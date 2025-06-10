@@ -22,11 +22,48 @@ const ProductCard = ({ item }) => {
     navigate(`/items/${id}`);
   };
 
-  const isReconditioned = condition === "reconditioned" || condition === "refurbished";
-  const hasDiscount = price?.regular_amount > price?.amount;
+  const isReconditioned =
+    condition === "reconditioned" || condition === "refurbished";
+
+  const currentPrice = price?.amount || 0;
+  let regularPrice = price?.regular_amount;
+
+  // Extraer número de cuotas desde string tipo "12 cuotas"
+  let cuotas = 0;
+  if (typeof installments === "string") {
+    const match = installments.match(/^(\d+)/);
+    cuotas = match ? parseInt(match[1], 10) : 0;
+  }
+
+  // Calcular valor de cuota
+  const precioCuota = cuotas > 0 ? currentPrice / cuotas : 0;
+  const totalCuotas = precioCuota * cuotas;
+  const esPrecioIgual = Math.abs(totalCuotas - currentPrice) < 1;
+
+  // Solo infiere regularPrice si hay recargo por cuotas
+  const inferredRegularPrice =
+    !regularPrice && !esPrecioIgual && totalCuotas > currentPrice
+      ? Math.round(totalCuotas)
+      : null;
+
+  const effectiveRegularPrice =
+    typeof regularPrice === "number"
+      ? regularPrice
+      : inferredRegularPrice;
+
+  const hasDiscount =
+    typeof effectiveRegularPrice === "number" &&
+    effectiveRegularPrice > currentPrice;
+
   const discountPercent = hasDiscount
-    ? Math.round(((price.regular_amount - price.amount) / price.regular_amount) * 100)
+    ? Math.round(((effectiveRegularPrice - currentPrice) / effectiveRegularPrice) * 100)
     : 0;
+
+  const formatCurrency = (val) =>
+    `$${val.toLocaleString("es-AR", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    })}`;
 
   return (
     <div className="product-card" onClick={handleClick}>
@@ -51,49 +88,32 @@ const ProductCard = ({ item }) => {
         )}
 
         <div className="product-card__price">
-          {hasDiscount && (
+          {hasDiscount ? (
             <>
               <div className="product-card__price-regular">
-                ${price.regular_amount.toLocaleString("es-AR")}
+                {formatCurrency(effectiveRegularPrice)}
               </div>
               <div className="product-card__price-current">
-                ${price.amount.toLocaleString("es-AR")}
-                <span className="product-card__discount"> {discountPercent}% OFF</span>
+                {formatCurrency(currentPrice)}
+                <span className="product-card__discount">
+                  {" "}{discountPercent}% OFF
+                </span>
               </div>
             </>
-          )}
-
-          {!hasDiscount && (
+          ) : (
             <div className="product-card__price-current">
-              ${price.amount.toLocaleString("es-AR")}
+              {formatCurrency(currentPrice)}
             </div>
           )}
         </div>
 
-        {installments && (() => {
-          const cuotasMatch = installments.match(/^(\d+)/);
-          const cuotas = cuotasMatch ? parseInt(cuotasMatch[1]) : null;
-
-          if (!cuotas || cuotas <= 0) return null;
-
-          const precioCuota = price.amount / cuotas;
-          const totalCuotas = precioCuota * cuotas;
-          const esPrecioIgual = Math.abs(totalCuotas - price.amount) < 1;
-
-          return (
-            <div className="product-card__installments">
-              {esPrecioIgual
-                ? `Mismo precio en ${cuotas} cuotas de $${precioCuota.toLocaleString("es-AR", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}`
-                : `${cuotas} cuotas de $${precioCuota.toLocaleString("es-AR", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}`}
-            </div>
-          );
-        })()}
+        {cuotas > 0 && (
+          <div className="product-card__installments">
+            {esPrecioIgual
+              ? `Mismo precio en ${cuotas} cuotas de ${formatCurrency(precioCuota)}`
+              : `${cuotas} cuotas de ${formatCurrency(precioCuota)}`}
+          </div>
+        )}
 
         {free_shipping && (
           <div className="product-card__shipping">Envío gratis</div>

@@ -54,28 +54,43 @@ router.get('/', async (req, res) => {
         sellerCache.set(item.seller.id, sellerName);
       }
 
+      const price = item.price;
+      const originalPrice = item.original_price || null;
+      const installments = item.installments ?? null;
+
+      let regularPrice = originalPrice;
+      let discountedPrice = price;
+
+      if (!regularPrice && installments && installments.quantity > 0 && installments.amount > 0) {
+        const cuotasTotal = installments.quantity * installments.amount;
+        const diferencia = cuotasTotal - price;
+        if (diferencia > 1) {
+          regularPrice = Math.round(cuotasTotal);
+        }
+      }
+
       itemCache.set(item.id, {
-        price: item.price,
-        installments: item.installments || null,
+        price,
+        installments,
         free_shipping: item.shipping?.free_shipping || false,
       });
 
       return {
         id: item.id,
         title: item.title,
-        price: {
-          currency: item.currency_id,
-          amount: item.price,
-          decimals: parseFloat((item.price % 1).toFixed(2)),
-          regular_amount: null,
-        },
         picture: item.thumbnail.replace(/-I\.(jpg|png|webp)$/, "-O.jpg"),
         condition: item.condition,
         free_shipping: item.shipping?.free_shipping || false,
-        installments: item.installments
-          ? `${item.installments.quantity} cuotas`
+        installments: installments
+          ? `${installments.quantity} cuotas`
           : null,
         seller: sellerName ? { name: sellerName } : null,
+        price: {
+          currency: item.currency_id,
+          amount: discountedPrice,
+          decimals: parseFloat((discountedPrice % 1).toFixed(2)),
+          regular_amount: regularPrice,
+        },
       };
     });
 
